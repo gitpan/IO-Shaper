@@ -8,7 +8,7 @@ use IO::Socket;
 use IO::Select;
 use Time::HiRes;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 sub new {
   my($type, %args) = @_;
@@ -27,6 +27,8 @@ sub Bps       { @_ > 1 ? $_[0]->{Bps}       = $_[1] : $_[0]->{Bps}       }
 
 sub run {
   my $this = shift;
+
+  local $SIG{PIPE} = 'IGNORE';
 
   my @localArgs  = map { $_ => $this->$_() } grep defined($this->$_()), qw(LocalPort LocalAddr LocalHost);
   my @remoteArgs = map { $_ => $this->$_() } grep defined($this->$_()), qw(PeerPort  PeerAddr  PeerHost );
@@ -53,8 +55,8 @@ sub run {
     my $bytesToRead = $bps && @dest ? $bps / @dest : 32768;
     for (my $i = 0; $i < @dest; $i++) {
       my($client, $dest) = @{ $dest[$i] };
-      $client->recv($recvBuf[$i], $bytesToRead, IO::Socket::MSG_DONTWAIT|IO::Socket::MSG_NOSIGNAL);
-      $dest->recv  ($sendBuf[$i], $bytesToRead, IO::Socket::MSG_DONTWAIT|IO::Socket::MSG_NOSIGNAL);
+      $client->recv($recvBuf[$i], $bytesToRead, IO::Socket::MSG_DONTWAIT);
+      $dest->recv  ($sendBuf[$i], $bytesToRead, IO::Socket::MSG_DONTWAIT);
       $bytes += length($recvBuf[$i]) + length($sendBuf[$i]);
     }
     my $now = Time::HiRes::time();
@@ -81,8 +83,8 @@ sub run {
 
     for (my $i = 0; $i < @dest; $i++) {
       my($client, $dest) = @{ $dest[$i] };
-      $dest->send($recvBuf[$i], IO::Socket::MSG_NOSIGNAL);
-      $client->send($sendBuf[$i], IO::Socket::MSG_NOSIGNAL);
+      $dest->send($recvBuf[$i]);
+      $client->send($sendBuf[$i]);
     }
   }
 }

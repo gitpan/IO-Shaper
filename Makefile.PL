@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'IO::Shaper',
     'VERSION_FROM'	=> 'Shaper.pm', # finds $VERSION
-    'PREREQ_PM'		=> {IO::Socket => 0, IO::Select => 0, Time::HiRes => 0},
+    'PREREQ_PM'		=> {IO::Select => 0, Time::HiRes => 0},
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'Shaper.pm', # retrieve abstract from module
        AUTHOR     => 'Benjamin Holzman <bholzman@earthlink.net>') : ()),
